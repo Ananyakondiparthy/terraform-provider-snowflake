@@ -75,17 +75,35 @@ func (sb *SchemaBuilder) WithTags(tags []TagValue) *SchemaBuilder {
 
 // AddTag returns the SQL query that will add a new tag to the schema.
 func (sb *SchemaBuilder) AddTag(tag TagValue) string {
-	return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
+	if tag.schema != "" {
+		if tag.database != "" {
+			return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
+		}
+		return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v" = "%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
+	}
+	return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v" = "%v"`, sb.QualifiedName(), tag.Name, tag.Value)
 }
 
 // ChangeTag returns the SQL query that will alter a tag on the schema.
 func (sb *SchemaBuilder) ChangeTag(tag TagValue) string {
-	return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
+	if tag.schema != "" {
+		if tag.database != "" {
+			return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
+		}
+		return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v" = "%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
+	}
+	return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v" = "%v"`, sb.QualifiedName(), tag.Name, tag.Value)
 }
 
 // UnsetTag returns the SQL query that will unset a tag on the schema.
 func (sb *SchemaBuilder) UnsetTag(tag TagValue) string {
-	return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"."%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name)
+	if tag.schema != "" {
+		if tag.database != "" {
+			return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"."%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
+		}
+		return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
+	}
+	return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"`, sb.QualifiedName(), tag.Name, tag.Value)
 }
 
 // Schema returns a pointer to a Builder that abstracts the DDL operations for a schema.
