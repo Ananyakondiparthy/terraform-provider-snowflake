@@ -75,8 +75,8 @@ func (sb *SchemaBuilder) WithTags(tags []TagValue) *SchemaBuilder {
 
 // AddTag returns the SQL query that will add a new tag to the schema.
 func (sb *SchemaBuilder) AddTag(tag TagValue) string {
-	if tag.schema != "" {
-		if tag.database != "" {
+	if tag.Schema != "" {
+		if tag.Database != "" {
 			return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
 		}
 		return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v" = "%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
@@ -86,8 +86,8 @@ func (sb *SchemaBuilder) AddTag(tag TagValue) string {
 
 // ChangeTag returns the SQL query that will alter a tag on the schema.
 func (sb *SchemaBuilder) ChangeTag(tag TagValue) string {
-	if tag.schema != "" {
-		if tag.database != "" {
+	if tag.Schema != "" {
+		if tag.Database != "" {
 			return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
 		}
 		return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v" = "%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
@@ -97,8 +97,8 @@ func (sb *SchemaBuilder) ChangeTag(tag TagValue) string {
 
 // UnsetTag returns the SQL query that will unset a tag on the schema.
 func (sb *SchemaBuilder) UnsetTag(tag TagValue) string {
-	if tag.schema != "" {
-		if tag.database != "" {
+	if tag.Schema != "" {
+		if tag.Database != "" {
 			return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"."%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
 		}
 		return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
