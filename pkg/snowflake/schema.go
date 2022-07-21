@@ -99,11 +99,11 @@ func (sb *SchemaBuilder) ChangeTag(tag TagValue) string {
 func (sb *SchemaBuilder) UnsetTag(tag TagValue) string {
 	if tag.Schema != "" {
 		if tag.Database != "" {
-			return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"."%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
+			return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"."%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name)
 		}
-		return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
+		return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"`, sb.QualifiedName(), tag.Schema, tag.Name)
 	}
-	return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"`, sb.QualifiedName(), tag.Name, tag.Value)
+	return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"`, sb.QualifiedName(), tag.Name)
 }
 
 // Schema returns a pointer to a Builder that abstracts the DDL operations for a schema.
@@ -141,6 +141,15 @@ func (sb *SchemaBuilder) Create() string {
 	if sb.setDataRetentionDays {
 		q.WriteString(fmt.Sprintf(` DATA_RETENTION_TIME_IN_DAYS = %d`, sb.dataRetentionDays))
 	}
+	//Ananya Code
+	if sb.tags!=[] {
+		q.WriteString(fmt.Sprintf(` WITH TAG ( `))
+		for index, element := range sb.tags {
+			q.WriteString(fmt.Sprintf(` %v = %v`,element.Name,element.Value))
+		}
+		q.WriteString(fmt.Sprintf(` ) `))
+	}
+
 
 	if sb.comment != "" {
 		q.WriteString(fmt.Sprintf(` COMMENT = '%v'`, EscapeString(sb.comment)))
