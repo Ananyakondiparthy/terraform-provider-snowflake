@@ -76,7 +76,9 @@ func (sb *SchemaBuilder) WithTags(tags []TagValue) *SchemaBuilder {
 // AddTag returns the SQL query that will add a new tag to the schema.
 func (sb *SchemaBuilder) AddTag(tag TagValue) string {
 	if tag.Schema != "" {
+		log.Printf("SchemaBuilder.AddTag function has schema")
 		if tag.Database != "" {
+			log.Printf("SchemaBuilder.AddTag function has schema and Database")
 			return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
 		}
 		return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v" = "%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
@@ -87,18 +89,23 @@ func (sb *SchemaBuilder) AddTag(tag TagValue) string {
 // ChangeTag returns the SQL query that will alter a tag on the schema.
 func (sb *SchemaBuilder) ChangeTag(tag TagValue) string {
 	if tag.Schema != "" {
+		log.Printf("SchemaBuilder.ChangeTag function has schema")
 		if tag.Database != "" {
 			return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v"."%v" = "%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name, tag.Value)
 		}
+
 		return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v"."%v" = "%v"`, sb.QualifiedName(), tag.Schema, tag.Name, tag.Value)
 	}
+	log.printf("SchemaBuilder.ChangeTag has no Schema")
 	return fmt.Sprintf(`ALTER SCHEMA %s SET TAG "%v" = "%v"`, sb.QualifiedName(), tag.Name, tag.Value)
 }
 
 // UnsetTag returns the SQL query that will unset a tag on the schema.
 func (sb *SchemaBuilder) UnsetTag(tag TagValue) string {
 	if tag.Schema != "" {
+		log.Printf("SchemaBuilder.UnsetTag function has schema")
 		if tag.Database != "" {
+			log.Printf("SchemaBuilder.UnsetAddTag function has schema and db")
 			return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"."%v"`, sb.QualifiedName(), tag.Database, tag.Schema, tag.Name)
 		}
 		return fmt.Sprintf(`ALTER SCHEMA %s UNSET TAG "%v"."%v"`, sb.QualifiedName(), tag.Schema, tag.Name)
@@ -126,27 +133,35 @@ func Schema(name string) *SchemaBuilder {
 // Create returns the SQL query that will create a new schema.
 func (sb *SchemaBuilder) Create() string {
 	q := strings.Builder{}
+	log.Printf("The string builder is",q)
 	q.WriteString(`CREATE`)
 
 	if sb.transient {
 		q.WriteString(` TRANSIENT`)
+		log.Printf("created transient")
 	}
 
 	q.WriteString(fmt.Sprintf(` SCHEMA %v`, sb.QualifiedName()))
 
 	if sb.managedAccess {
+		log.printf("created managed access")
 		q.WriteString(` WITH MANAGED ACCESS`)
 	}
 
 	if sb.setDataRetentionDays {
+		log.printf("Added set Data retention days")
 		q.WriteString(fmt.Sprintf(` DATA_RETENTION_TIME_IN_DAYS = %d`, sb.dataRetentionDays))
 	}
 	//Ananya Code
-	if sb.tags!=[] {
+	if len(sb.tags)>0 {
 		q.WriteString(fmt.Sprintf(` WITH TAG ( `))
+		log.printf("checked if tag exist")
 		for index, element := range sb.tags {
+			log.printf("Tags loop starts")
 			q.WriteString(fmt.Sprintf(` %v = %v`,element.Name,element.Value))
+			fmt.Println(index)
 		}
+		log.printf("Tag ends")
 		q.WriteString(fmt.Sprintf(` ) `))
 	}
 

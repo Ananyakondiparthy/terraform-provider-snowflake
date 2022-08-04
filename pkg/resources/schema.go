@@ -125,6 +125,7 @@ func CreateSchema(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	name := d.Get("name").(string)
 	database := d.Get("database").(string)
+	log.printf("Create Schema in resources")
 
 	builder := snowflake.Schema(name).WithDB(database)
 
